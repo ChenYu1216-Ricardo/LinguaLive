@@ -95,7 +95,7 @@ const TRANSLATION_UNAVAILABLE = "【翻译暂不可用】";
 const NO_SOUND_MESSAGE = "未检测到声音，请检查当前麦克风输入。";
 const NO_RESULT_MESSAGE =
   "已检测到麦克风声音，但当前浏览器没有返回语音字幕。请复制链接，用最新版 Chrome 打开。";
-const MAX_HISTORY = 2_000;
+const NETWORK_FAILURE_MESSAGE = "浏览器语音识别服务连续连接失败。请检查网络，或用最新版 Chrome 打开此页面重试。"; const MAX_HISTORY = 2_000;
 const HISTORY_STORAGE_KEY = "classroom-interpreter-history-v1";
 const LANGUAGE_STORAGE_KEY = "classroom-interpreter-languages-v1";
 const GUIDE_STORAGE_KEY = "classroom-interpreter-guide-v1";
@@ -334,7 +334,7 @@ export default function Home() {
   const unrecognizedAudioAtRef = useRef(0);
   const lastMeterUpdateRef = useRef(0);
   const recognitionStalledRef = useRef(false);
-  const noSpeechCountRef = useRef(0);
+  const noSpeechCountRef = useRef(0); const networkFailureCountRef = useRef(0);
   const stallRestartCountRef = useRef(0);
   const committedResultsRef = useRef(new Set<number>());
   const lastNoMatchAtRef = useRef(0);
@@ -839,7 +839,7 @@ export default function Home() {
       let interim = "";
       unrecognizedAudioAtRef.current = 0;
       recognitionStalledRef.current = false;
-      stallRestartCountRef.current = 0;
+      stallRestartCountRef.current = 0; networkFailureCountRef.current = 0;
       noSpeechCountRef.current = 0;
       setError((current) =>
         current === NO_SOUND_MESSAGE || current === NO_RESULT_MESSAGE
@@ -905,7 +905,7 @@ export default function Home() {
         return;
       }
       setError(errorMessage(event.error));
-      if (event.error === "network") {
+      if (event.error === "network") { networkFailureCountRef.current += 1; if (networkFailureCountRef.current >= 3) { shouldListenRef.current = false; setSessionState("error"); setError(NETWORK_FAILURE_MESSAGE); releaseMicrophone(); return; }
         restartDelayRef.current = Math.min(
           Math.max(restartDelayRef.current * 2, 1000),
           4000,
@@ -948,7 +948,7 @@ export default function Home() {
     setError("");
     setLinkCopied(false);
     setSessionState("starting");
-    shouldListenRef.current = true;
+    shouldListenRef.current = true; networkFailureCountRef.current = 0;
     isPausedRef.current = false;
 
     void ensureTranslator(sourceLanguageRef.current, targetLanguageRef.current);
