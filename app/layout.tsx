@@ -6,7 +6,7 @@ const title = "LinguaLive｜实时多语言翻译";
 const description =
   "支持多种主流语言的实时双语字幕、语音播报、全文记录与单词释义。";
 const productionOrigin =
-  "https://classroom-live-interpreter.sunnycy3916.chatgpt.site";
+  process.env.PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 export async function generateMetadata(): Promise<Metadata> {
   const requestHeaders = await headers();
