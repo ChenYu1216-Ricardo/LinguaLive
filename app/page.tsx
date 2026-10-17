@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import LoginOptions from "./login-options";
+
 import { isUnclearSpeechResult } from "./speech-results";
 
 type SessionState = "idle" | "starting" | "listening" | "paused" | "error";
@@ -1530,7 +1530,7 @@ export default function Home() {
         </div>
 
         <div className="top-actions">
-          <LoginOptions />
+          
           <button
             className={`utility-button history-toggle ${historyOpen ? "is-on" : ""}`}
             type="button"
